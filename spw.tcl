@@ -1,141 +1,113 @@
 #! /bin/env tclsh
 
-################# TEST  ##############################
+################# TCL TEST  ##############################
 # new_design -name "prepi" -family "ProASIC3E"
 # save_design {prepi.adb}
 # puts {TEST}
 # close_design 
 ######################################################
-# running from cmd
-# >designer "SCRIPT:spw.tcl iSpw0Stb iSpw0Dat *r.do*" "SCRIPT_DIR:C:\Users\aczuba\TCL\spw_script" "LOGFILE:spw_report.log"
+# running from cmd (without error handling option)
+# >designer "SCRIPT:spw.tcl iSpw0Stb iSpw0Dat *r.do*" "SCRIPT_DIR:<script path>" "LOGFILE:<log file name.log"
+# iSpw0Stb - Strobe input pin
+# iSpw0Dat - Data input pin
+# *r.do* - filter to input registers 
+# argv3 - error handling option:
+#					  [int] 1 - ON
+#	 			OTHER or NONE - OFF
+# running from cmd (with error handling option)
+# designer "SCRIPT:spw.tcl iSpw0Stb iSpw0Dat *r.do* 1" "SCRIPT_DIR:C:\Users\aczuba\TCL\spw_script" "LOGFILE:spw_report.log"
 ######################################################
+
 set argv0 [lindex $::argv 0]
 set argv1 [lindex $::argv 1]
 set argv2 [lindex $::argv 2]
 set argv3 [lindex $::argv 3]
 
-# set setNameStb {iSpwDatToReg}
-# set setNameDat {ISpwStbToCLK}
-set setSourceStb { iSpw0Stb }
-set setSourceDat { iSpw0Dat }
-set setSink { *r.do* }
+set setNameStb {iSpwDatToReg}
+set setNameDat {iSpwStbToCLK}
+
+## Replaced by argv
+# set setSourceStb { iSpw0Stb } 
+# set setSourceDat { iSpw0Dat } 
+# set setSink { *r.do* }
 
 puts "$argv0 is argv0"
 puts "$argv1 is argv1"
 puts "$argv2 is argv2"
+puts "$argv3 is argv3"
 
 set designFileTest {C:\Users\aczuba\TCL\spw_script\P3_DPU.adb} 
 set designFile {C:\DPU FPGA repo v2\alllib\designs\P3CCB_RT\P3_DPU.adb}
 puts $designFile
 
-open_design $designFileTest
-	if  { [catch { open_design $designFileTest }]} { 
-		puts "Failed to open design"
-		# Handle Failure 
-	} else { 
-		puts "Design opened successfully"
-		# Proceed to further processing 
-	} 
 
-proc add_set {fromStb fromDat to} {
-	set setNameDat {iSpwDatToReg}
-	set setNameStb {iSpwStbToCLK}
+proc add_set {fromStb fromDat to errorFlag} {
 
-	st_create_set -name  $setNameStb -source  $fromStb -sink  $to
-	if  { [catch {st_create_set -name  $setNameStb -source  $fromStb -sink  $to }]} {
-		puts "Failed to set path \n $::errorInfo \n $::errorCode"
-		# Handle Failure 
-	} else { 
-		puts "Path created successfully "
-		# Proceed to further processing 
-	} 
 
-	st_create_set -name $setNameDat -source $fromDat -sink  $to
-	if  { [catch {st_create_set -name $setNameDat -source $fromDat -sink  $to }]} {
-		puts "Failed to set path \n $::errorInfo \n $::errorCode"
-		# Handle Failure 
-	} else { 
-		puts "Path created successfully "
-		# Proceed to further processing 
-	} 
-
+	st_create_set -name $::setNameStb -source  $fromStb -sink  $to
+	st_create_set -name $::setNameDat -source $fromDat -sink  $to
+	puts "##########\nSETS ADDED\n##########"
+	if {$errorFlag == 1} {
+		if  { [catch {st_create_set -name  $::setNameStb -source  $fromStb -sink  $to }] || [catch {st_create_set -name $setNameDat -source $fromDat -sink  $to }]} {
+			puts "Failed to set paths \n $::errorInfo \n"
+			# Handle Failure 
+		} 
+	}
+	st_commit
 }
 
-proc clear_set {} {
-	set setNameDat {iSpwDatToReg}
-	set setNameStb {iSpwStbToCLK}
+proc clear_set {errorFlag} {
 
 
-	st_remove_set -name $setNameStb
-	if {[catch {st_remove_set -name $setNameStb}]} {
-		puts "Path $setNameStb doesn't exist. Will be created new path\n $::errorInfo \n $::errorCode"
-		# Handle Failure 
-		continue
-	} else {
-		puts "Path $setNameStb will be overwrited successfully"
+	st_remove_set -name $::setNameStb
+	st_remove_set -name $::setNameDat
+	puts "############\nSETS DELETED\n############"
+	if {$errorFlag == 1} {
+		if {[catch {st_remove_set -name $::setNameStb}] || [catch {st_remove_set -name $::setNameDat}]} {
+			puts "Path sets $::setNameStb or $::setNameDat doesn't exist. Will be created new path\n $::errorInfo \n"
+			# Handle Failure 
+		} 
 	}
-	st_remove_set -name $setNameDat
-	if {[catch {st_remove_set -name $setNameDat}]} {
-	puts "Path $setNameDat doesn't exist. Will be created new path\n $::errorInfo \n $::errorCode"		# Handle Failure 
-		continue
-	} else {
-		puts "Path $setNameDat will be overwrited successfully"
+	st_commit
+}
+
+proc list_set {errorFlag} {
+
+	puts "#################\nPATH LIST - START\n#################"
+	puts "\n------------\niSpwStbToCLK\n------------"
+	st_list_paths -set $::setNameStb
+	puts "\n------------\niSpwDatToReg\n------------"
+	st_list_paths -set $::setNameDat 
+	puts "###############\nPATH LIST - END\n###############"
+	if {$errorFlag == 1} {
+		if  { [catch st_list_paths -set $::setNameStb] || [catch st_list_paths -set $::setNameDat]} {
+			puts "Failed to read sets \n $::errorInfo \n"
+			# Handle Failure 
+		}
 	}
 	
+	st_commit
 }
 
-proc list_set {} {
-	set setNameDat {iSpwDatToReg}
-	set setNameStb {iSpwStbToCLK}
 
-	st_list_paths -set $setNameStb
-	st_list_paths -set $setNameDat 
-	if  { [catch st_list_paths -set $setNameStb] || [catch st_list_paths -set $setNameDat]} {
-		puts "Failed to read sets \n $::errorInfo \n $::errorCode"
-		# Handle Failure 
-		continue
-	} else { 
-		puts "Sets read successfully."
-		# Proceed to further processing
-	}
-
-
-}
-
-# proc gen_report {} {
-# 	 report -type {timing} \
-# 	 		-print_summary {no}\
-# 	 		-analysis {max}\
-# 	 		-print_paths {yes}\
-# 	 		-include_user_sets {yes}\
-# 	 		-include_pin_to_pin {no}\
-# 	 		-include_clock_domains {yes}\
-# 	 		spw_timing_report
-
-# 	if  { [catch { report -type timing spw_timing_report -print_summary no -analysis max -print_paths yes -include_user_sets yes -include_pin_to_pin no -include_clock_domains yes -select_clock_domains $clock }]} { 
-# 		puts "Failed generate SpaceWire timing report"
-# 		# Handle Failure 
-# 	} else { 
-# 		puts "Timing SpaceWire report generated successfully"
-# 		# Proceed to further processing 
-# 	} 		
-# }
-
-
-proc main_exec {fromStb fromDat to} {
-	add_set $fromStb $fromDat $to
-	list_set
-	clear_set
+proc main_exec {fromStb fromDat to errorFlag} {
+	add_set $fromStb $fromDat $to $errorFlag
+	list_set $errorFlag
+	clear_set $errorFlag
 	# gen_report 
 
 }
 
-main_exec $argv0 $argv1 $argv2
-st_commit
-# st_list_paths -set {iSpwDatToReg}
-puts "$argv0 is argv0"
-puts "$argv1 is argv1"
-puts "$argv2 is argv2"
+open_design $designFileTest
+	if  { [catch { open_design $designFileTest }]} { 
+		puts "Failed to open design \n $::errorInfo \n"
+		# Handle Failure 
+	} else { 
+		puts "##########################\nDESIGN OPENED SUCCESSFULLY\n##########################"
+		# Proceed to further preocssing 
+	} 
+
+main_exec $argv0 $argv1 $argv2 $argv3
 st_commit
 save_design {P3_DPU.adb}
 close_design

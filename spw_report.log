@@ -14,26 +14,22 @@ Design closed.
 Info: The design C:\Users\aczuba\TCL\spw_script\P3_DPU.adb was last modified by software version
       11.8.0.26.
 Opened an existing design C:\Users\aczuba\TCL\spw_script\P3_DPU.adb.
-Design opened successfully
+##########################
+DESIGN OPENED SUCCESSFULLY
+##########################
 While analyzing gated clock network, ambiguities have been found on gates
 HIEFFPLA_INST_2_385292:Y.
 The timing models of these gates have been simplified for Static Timing Analysis.
-Warning: The command  [timer] failed with error code 0x1
-Failed to set path 
- Error while executing command miro_st_create_set: Set with same name already exists
-    while executing
-"miro_st_create_set {-name} {iSpwStbToCLK} {-source} {iSpw0Stb} {-sink} {*r.do*}"
-    invoked from within
-"st_create_set -name  $setNameStb -source  $fromStb -sink  $to " 
- NONE
-Warning: The command  [timer] failed with error code 0x1
-Failed to set path 
- Error while executing command miro_st_create_set: Set with same name already exists
-    while executing
-"miro_st_create_set {-name} {iSpwDatToReg} {-source} {iSpw0Dat} {-sink} {*r.do*}"
-    invoked from within
-"st_create_set -name $setNameDat -source $fromDat -sink  $to " 
- NONE
+##########
+SETS ADDED
+##########
+#################
+PATH LIST - START
+#################
+
+------------
+iSpwStbToCLK
+------------
 Path 1
   From:                        iSpw0Stb
   To:                          I_P3SpwRX/I_GrSpwPhy0/r.do_tmr2[0]:CLK
@@ -83,6 +79,10 @@ Path 6
   Required (ns):
 
 
+
+------------
+iSpwDatToReg
+------------
 Path 1
   From:                        iSpw0Dat
   To:                          I_P3SpwRX/I_GrSpwPhy0/r.do[1]:D
@@ -156,22 +156,14 @@ Path 9
   Required (ns):
 
 
-Warning: The command  [timer] failed with error code 0x1
-Failed to read path 
- Error while executing command miro_st_list_paths:  One of:
-        -set,
-        -clock & -type,
-        -source_clock & -sink_clock
-        -source & -sink
-        -in_to_out
- must be set.
-    while executing
-"miro_st_list_paths"
-    invoked from within
-"st_list_paths" 
- NONE
-Error: Failure when executing Tcl script. [ Line 133: invoked "continue" outside of a loop ]
-
-The Execute Script command failed ( 00:01:42 )
+###############
+PATH LIST - END
+###############
+############
+SETS DELETED
+############
+Design saved to file P3_DPU.adb.
 Design closed.
 
+
+The Execute Script command succeeded ( 00:01:54 )
