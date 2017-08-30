@@ -6,20 +6,30 @@
 # puts {TEST}
 # close_design 
 ######################################################
-
+# running from cmd
+# >designer "SCRIPT:spw.tcl iSpw0Stb iSpw0Dat *r.do*" "SCRIPT_DIR:C:\Users\aczuba\TCL\spw_script" "LOGFILE:spw_report.log"
+######################################################
 set argv0 [lindex $::argv 0]
 set argv1 [lindex $::argv 1]
 set argv2 [lindex $::argv 2]
 set argv3 [lindex $::argv 3]
 
+# set setNameStb {iSpwDatToReg}
+# set setNameDat {ISpwStbToCLK}
+set setSourceStb { iSpw0Stb }
+set setSourceDat { iSpw0Dat }
+set setSink { *r.do* }
 
+puts "$argv0 is argv0"
+puts "$argv1 is argv1"
+puts "$argv2 is argv2"
 
-
-set designFile {C:\Users\aczuba\TCL\spw_script\P3_DPU.adb} 
+set designFileTest {C:\Users\aczuba\TCL\spw_script\P3_DPU.adb} 
+set designFile {C:\DPU FPGA repo v2\alllib\designs\P3CCB_RT\P3_DPU.adb}
 puts $designFile
 
-open_design $designFile
-	if  { [catch { open_design $designFile }]} { 
+open_design $designFileTest
+	if  { [catch { open_design $designFileTest }]} { 
 		puts "Failed to open design"
 		# Handle Failure 
 	} else { 
@@ -27,13 +37,21 @@ open_design $designFile
 		# Proceed to further processing 
 	} 
 
-proc add_set {from to} {
-	set createSet "-name { iToRegClk } -source { $from } -sink { $to }"
-	st_create_set $createSet
-	# st_create_set -name { dataToRegClk }\
-	# 	 -source { $from }\
-	# 	 -sink { $to }
-	if  { [catch { st_create_set $createSet }]} { 
+proc add_set {fromStb fromDat to} {
+	set setNameDat {iSpwDatToReg}
+	set setNameStb {iSpwStbToCLK}
+
+	st_create_set -name  $setNameStb -source  $fromStb -sink  $to
+	if  { [catch {st_create_set -name  $setNameStb -source  $fromStb -sink  $to }]} {
+		puts "Failed to set path \n $::errorInfo \n $::errorCode"
+		# Handle Failure 
+	} else { 
+		puts "Path created successfully "
+		# Proceed to further processing 
+	} 
+
+	st_create_set -name $setNameDat -source $fromDat -sink  $to
+	if  { [catch {st_create_set -name $setNameDat -source $fromDat -sink  $to }]} {
 		puts "Failed to set path \n $::errorInfo \n $::errorCode"
 		# Handle Failure 
 	} else { 
@@ -43,35 +61,46 @@ proc add_set {from to} {
 
 }
 
-# proc error {add_set_error} 
-# {
-# 	if  { [catch { st_create_set -name { iToRegClk } -source { $from } -sink { $to } }]} { 
-# 		puts "Failed to set path"
-# 		# Handle Failure 
-# 	} else { 
-# 		puts "Path created successfully"
-# 		# Proceed to further processing 
-# 	} 
-# 	set resource [some allocator]
-# 	if {[set result [catch {some code with $resource} resulttext]]} {
-#     # remember global error state, as de-allocation may overwrite it
-#     set einfo $::errorInfo
-#     set ecode $::errorCode
+proc clear_set {} {
+	set setNameDat {iSpwDatToReg}
+	set setNameStb {iSpwStbToCLK}
 
-#     # free the resource, ignore nested errors
-#     catch {deallocate $resource}
 
-#     # report the error with original details
-#     return -code $result \
-#            -errorcode $ecode \
-#            -errorinfo $einfo \
-#            $resulttext
-# }
-# deallocate $resource
+	st_remove_set -name $setNameStb
+	if {[catch {st_remove_set -name $setNameStb}]} {
+		puts "Path $setNameStb doesn't exist. Will be created new path\n $::errorInfo \n $::errorCode"
+		# Handle Failure 
+		continue
+	} else {
+		puts "Path $setNameStb will be overwrited successfully"
+	}
+	st_remove_set -name $setNameDat
+	if {[catch {st_remove_set -name $setNameDat}]} {
+	puts "Path $setNameDat doesn't exist. Will be created new path\n $::errorInfo \n $::errorCode"		# Handle Failure 
+		continue
+	} else {
+		puts "Path $setNameDat will be overwrited successfully"
+	}
+	
+}
 
-# continue normally
+proc list_set {} {
+	set setNameDat {iSpwDatToReg}
+	set setNameStb {iSpwStbToCLK}
 
-# }
+	st_list_paths -set $setNameStb
+	st_list_paths -set $setNameDat 
+	if  { [catch st_list_paths -set $setNameStb] || [catch st_list_paths -set $setNameDat]} {
+		puts "Failed to read sets \n $::errorInfo \n $::errorCode"
+		# Handle Failure 
+		continue
+	} else { 
+		puts "Sets read successfully."
+		# Proceed to further processing
+	}
+
+
+}
 
 # proc gen_report {} {
 # 	 report -type {timing} \
@@ -90,20 +119,23 @@ proc add_set {from to} {
 # 		puts "Timing SpaceWire report generated successfully"
 # 		# Proceed to further processing 
 # 	} 		
-
 # }
 
 
-proc main_exec {from to} {
-	add_set $from $to
+proc main_exec {fromStb fromDat to} {
+	add_set $fromStb $fromDat $to
+	list_set
+	clear_set
 	# gen_report 
 
 }
+
+main_exec $argv0 $argv1 $argv2
+st_commit
+# st_list_paths -set {iSpwDatToReg}
 puts "$argv0 is argv0"
 puts "$argv1 is argv1"
 puts "$argv2 is argv2"
-main_exec $argv1 $argv2 
-st_list_paths -set { iToRegClk }
-
+st_commit
 save_design {P3_DPU.adb}
 close_design

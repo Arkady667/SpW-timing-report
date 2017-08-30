@@ -2,7 +2,10 @@ Microsemi Libero Software
 Version: 11.8.0.26
 Release: v11.8
 
-C:\Users\aczuba\TCL\spw_script\P3_DPU.adb
+iSpw0Stb is argv0
+iSpw0Dat is argv1
+*r.do* is argv2
+C:\DPU FPGA repo v2\alllib\designs\P3CCB_RT\P3_DPU.adb
 Info: The design C:\Users\aczuba\TCL\spw_script\P3_DPU.adb was last modified by software version
       11.8.0.26.
 Opened an existing design C:\Users\aczuba\TCL\spw_script\P3_DPU.adb.
@@ -12,22 +15,163 @@ Info: The design C:\Users\aczuba\TCL\spw_script\P3_DPU.adb was last modified by 
       11.8.0.26.
 Opened an existing design C:\Users\aczuba\TCL\spw_script\P3_DPU.adb.
 Design opened successfully
-iSpw0* is argv0
-iSpw0* is argv1
-*r.do* is argv2
 While analyzing gated clock network, ambiguities have been found on gates
 HIEFFPLA_INST_2_385292:Y.
 The timing models of these gates have been simplified for Static Timing Analysis.
 Warning: The command  [timer] failed with error code 0x1
 Failed to set path 
- Error while executing command miro_st_create_set: Set creation failed
+ Error while executing command miro_st_create_set: Set with same name already exists
     while executing
-"miro_st_create_set {-name} { iToRegClk } {-source} { $::argv1 } {-sink} { $::argv2 }"
+"miro_st_create_set {-name} {iSpwStbToCLK} {-source} {iSpw0Stb} {-sink} {*r.do*}"
     invoked from within
-"st_create_set -name { iToRegClk } -source { $::argv1 } -sink { $::argv2 }" 
+"st_create_set -name  $setNameStb -source  $fromStb -sink  $to " 
  NONE
-Error: Failure when executing Tcl script. [ Line 44: invalid command name "}" ]
+Warning: The command  [timer] failed with error code 0x1
+Failed to set path 
+ Error while executing command miro_st_create_set: Set with same name already exists
+    while executing
+"miro_st_create_set {-name} {iSpwDatToReg} {-source} {iSpw0Dat} {-sink} {*r.do*}"
+    invoked from within
+"st_create_set -name $setNameDat -source $fromDat -sink  $to " 
+ NONE
+Path 1
+  From:                        iSpw0Stb
+  To:                          I_P3SpwRX/I_GrSpwPhy0/r.do_tmr2[0]:CLK
+  Delay (ns):                  8.031
+  Slack (ns):
+  Arrival (ns):                8.031
+  Required (ns):
 
-The Execute Script command failed ( 00:01:37 )
+Path 2
+  From:                        iSpw0Stb
+  To:                          I_P3SpwRX/I_GrSpwPhy0/r.do[0]:CLK
+  Delay (ns):                  8.031
+  Slack (ns):
+  Arrival (ns):                8.031
+  Required (ns):
+
+Path 3
+  From:                        iSpw0Stb
+  To:                          I_P3SpwRX/I_GrSpwPhy0/r.do_tmr3[0]:CLK
+  Delay (ns):                  8.031
+  Slack (ns):
+  Arrival (ns):                8.031
+  Required (ns):
+
+Path 4
+  From:                        iSpw0Stb
+  To:                          I_P3SpwRX/I_GrSpwPhy0/r.do[1]:CLK
+  Delay (ns):                  8.006
+  Slack (ns):
+  Arrival (ns):                8.006
+  Required (ns):
+
+Path 5
+  From:                        iSpw0Stb
+  To:                          I_P3SpwRX/I_GrSpwPhy0/r.do_tmr3[1]:CLK
+  Delay (ns):                  8.006
+  Slack (ns):
+  Arrival (ns):                8.006
+  Required (ns):
+
+Path 6
+  From:                        iSpw0Stb
+  To:                          I_P3SpwRX/I_GrSpwPhy0/r.do_tmr2[1]:CLK
+  Delay (ns):                  8.006
+  Slack (ns):
+  Arrival (ns):                8.006
+  Required (ns):
+
+
+Path 1
+  From:                        iSpw0Dat
+  To:                          I_P3SpwRX/I_GrSpwPhy0/r.do[1]:D
+  Delay (ns):                  4.655
+  Slack (ns):                  8.386
+  Arrival (ns):                12.655
+  Required (ns):               21.041
+
+Path 2
+  From:                        iSpw0Dat
+  To:                          I_P3SpwRX/I_GrSpwPhy0/r.do_tmr3[1]:D
+  Delay (ns):                  4.354
+  Slack (ns):                  8.687
+  Arrival (ns):                12.354
+  Required (ns):               21.041
+
+Path 3
+  From:                        iSpw0Dat
+  To:                          I_P3SpwRX/I_GrSpwPhy0/r.do_tmr2[1]:D
+  Delay (ns):                  3.917
+  Slack (ns):                  9.124
+  Arrival (ns):                11.917
+  Required (ns):               21.041
+
+Path 4
+  From:                        iSpw0Dat
+  To:                          I_P3SpwRX/I_GrSpwPhy0/r.do_tmr2[0]:CLK
+  Delay (ns):                  9.153
+  Slack (ns):
+  Arrival (ns):                9.153
+  Required (ns):
+
+Path 5
+  From:                        iSpw0Dat
+  To:                          I_P3SpwRX/I_GrSpwPhy0/r.do[0]:CLK
+  Delay (ns):                  9.153
+  Slack (ns):
+  Arrival (ns):                9.153
+  Required (ns):
+
+Path 6
+  From:                        iSpw0Dat
+  To:                          I_P3SpwRX/I_GrSpwPhy0/r.do_tmr3[0]:CLK
+  Delay (ns):                  9.153
+  Slack (ns):
+  Arrival (ns):                9.153
+  Required (ns):
+
+Path 7
+  From:                        iSpw0Dat
+  To:                          I_P3SpwRX/I_GrSpwPhy0/r.do[1]:CLK
+  Delay (ns):                  9.128
+  Slack (ns):
+  Arrival (ns):                9.128
+  Required (ns):
+
+Path 8
+  From:                        iSpw0Dat
+  To:                          I_P3SpwRX/I_GrSpwPhy0/r.do_tmr3[1]:CLK
+  Delay (ns):                  9.128
+  Slack (ns):
+  Arrival (ns):                9.128
+  Required (ns):
+
+Path 9
+  From:                        iSpw0Dat
+  To:                          I_P3SpwRX/I_GrSpwPhy0/r.do_tmr2[1]:CLK
+  Delay (ns):                  9.128
+  Slack (ns):
+  Arrival (ns):                9.128
+  Required (ns):
+
+
+Warning: The command  [timer] failed with error code 0x1
+Failed to read path 
+ Error while executing command miro_st_list_paths:  One of:
+        -set,
+        -clock & -type,
+        -source_clock & -sink_clock
+        -source & -sink
+        -in_to_out
+ must be set.
+    while executing
+"miro_st_list_paths"
+    invoked from within
+"st_list_paths" 
+ NONE
+Error: Failure when executing Tcl script. [ Line 133: invoked "continue" outside of a loop ]
+
+The Execute Script command failed ( 00:01:42 )
 Design closed.
 
